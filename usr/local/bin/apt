@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#! /usr/bin/python
 
 import sys, os
 
@@ -8,6 +8,7 @@ def usage():
 	print "       apt help command [options]"
 	print ""
 	print "Commands:"
+	print "auto	   	- Mark packages as having been automatically installed" 
 	print "autoclean	- Erase old downloaded archive files"
 	print "autoremove	- Remove automatically all unused packages" 
 	print "build     	- Build binary or source packages from sources" 
@@ -22,10 +23,13 @@ def usage():
 	print "dist-upgrade	- Perform an upgrade, possibly installing and removing packages"
 	print "download   	- Download the .deb file for a package"
 	print "dselect-upgrade	- Follow dselect selections"
-	print "held		- List all held packages"
 	print "help     	- Show help for a command"
 	print "hold		- Hold a package"
 	print "install   	- Install/upgrade packages"
+	print "list		- List packages based on package names"
+	print "list-inst	- List of installed packages"
+	print "list-up		- List of upgradable packages"
+	print "manual   	- Mark packages as having been manually installed"
 	print "policy   	- Show policy settings" 
 	print "purge    	- Remove packages and their configuration files" 
 	print "recommends	- List missing recommended packages for a particular package"
@@ -34,11 +38,14 @@ def usage():
 	print "remove   	- Remove packages" 
 	print "search   	- Search for a package by name and/or expression" 
 	print "show     	- Display detailed information about a package"
+	print "showauto     	- Print the list of automatically installed packages"
+	print "showhold     	- Print the list of package on hold"
+	print "showmanual     	- Print the list of manually installed packages"
 	print "source   	- Download source archives"
 	print "sources   	- Edit /etc/apt/sources.list with nano"
-	print "unhold		- Unhold a package"
 	print "update   	- Download lists of new/upgradable packages" 
 	print "upgrade  	- Perform a safe upgrade"
+	print "unhold		- Unhold a package"
 	print "version  	- Show the installed version of a package"
 	print "			This apt has Super Cow Powers"
 	sys.exit(1)
@@ -70,9 +77,12 @@ for argoption in argsuffix:
 if argcommand in ["install", "remove", "update", "upgrade", "dist-upgrade", "clean", "dselect-upgrade", "build-dep", "check", "autoremove", "autoclean"]:
 	aptcommand = "apt-get"
 	command = sudo + " " + aptcommand + " " + argcommand + argoptions		
+elif argcommand in ["auto", "manual", "hold", "unhold"]:
+	aptcommand = "apt-mark"
+	command = sudo + " " + aptcommand + " " + argcommand + argoptions
 elif argcommand in ["source", "moo"]:
 	aptcommand = "apt-get"
-	command = aptcommand + " " + argcommand + argoptions		
+	command = aptcommand + " " + argcommand + argoptions
 elif argcommand in ["search", "show", "changelog"]:
 	aptcommand = "aptitude"
 	command = aptcommand + " " + argcommand + argoptions
@@ -84,18 +94,24 @@ elif argcommand in ["reinstall"]:
 elif argcommand in ["stats", "depends", "rdepends", "policy"]:
 	aptcommand = "apt-cache"
 	command = aptcommand + " " + argcommand + argoptions
+elif argcommand in ["list"]:
+	aptcommand = "/usr/bin/apt"
+	command = aptcommand + " " + argcommand + argoptions
+elif argcommand in ["list-inst"]:
+	aptcommand = "/usr/bin/apt"
+	command = aptcommand + " list --installed"
+elif argcommand in ["list-up"]:
+	aptcommand = "/usr/bin/apt"
+	command = aptcommand + " list --upgradable"
+elif argcommand in ["showhold", "showauto", "showmanual"]:
+	aptcommand = "apt-mark"
+	command = aptcommand + " " + argcommand + argoptions
 elif argcommand == "sources":
 	command = sudo + " " + editor + " /etc/apt/sources.list"
-elif argcommand == "held":
-	command = "dpkg --get-selections | grep hold"
 elif argcommand == "contains":
 	command = "dpkg -S" + argoptions
 elif argcommand == "content":
 	command = "dpkg -L" + argoptions + " | sort"
-elif argcommand == "hold":
-	command = "echo " + argoptions + " hold | sudo dpkg --set-selections"
-elif argcommand == "unhold":
-	command = "echo " + argoptions + " install | sudo dpkg --set-selections"
 elif argcommand == "version":
 	command = "/usr/lib/linuxmint/common/version.py" + argoptions
 elif argcommand == "purge":
@@ -117,4 +133,3 @@ if (showHelp):
 	print "\"apt "+ argcommand + argoptions + "\" is equivalent to \"" + command + "\""
 else:	
 	os.system(command)
-
